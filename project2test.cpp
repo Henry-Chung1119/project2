@@ -45,12 +45,16 @@ class floor{
             }
         }
 };
-
+void setcelldistance(floor *cleaningroom, int cleaningcellnum, int initial_row, int initial_col, int situation){
+    
+}
 int main(){
     int m,n,battery;
+    int situation;
     char cell;
-    int **matrix;
+    //int **matrix;
     int initial_row,initial_col;
+    int cleaningcellnum;
     ifstream file1;
     file1.open("floor.data");
     if(!file1){
@@ -70,18 +74,37 @@ int main(){
                 initial_row=i;
                 initial_col=j;
             }
+            else{
+                cleaningcellnum++;
+            }
         }
     }
-        /*matrix=new int*[m];
-        for(int i=0;i<m;i++){
-            matrix[i]=new int[n];
-        }
-        for(int i=0;i<m;i++){
-            for(int j=0;j<n;j++){
-                file1 >> matrix[i][j];
-            }
-        }*/
-    
+    //setdistance
+    if(initial_row==0){
+        if(initial_col==0)
+            situation=1;
+        else if(initial_col==n-1)
+            situation=3;
+        else
+            situation=2;
+    }
+    else if(initial_row==m-1){
+        if(initial_col==0)
+            situation=4;
+        else if(initial_col==n-1)
+            situation=6;
+        else
+            situation=5;
+    }
+    else{
+        if(initial_col==0)
+            situation=7;
+        else if(initial_col==n-1)
+            situation=9;
+        else
+            situation=8;
+    }
+    setcelldistance(cleaningroom,cleaningcellnum,initial_row,initial_col,situation);
     for(int i=0;i<m;i++){
         for(int j=0;j<n;j++){
             cout << cleaningroom->matrixspace[i][j].getobstacle() << " ";
