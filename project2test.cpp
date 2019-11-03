@@ -201,7 +201,8 @@ void setcelldistance(floor *cleaningroom, int cleaningcellnum, int initial_row, 
                         if(!cleaningroom->matrixspace[i][j].getobstacle()){
                             if(cleaningroom->matrixspace[i][j].getdistance()==-1 || cleaningroom->matrixspace[i][j].getdistance()>newdistance+1)
                             {
-                                cleaningroom->matrixspace[i][j].setdistance(newdistance+1);
+                                if(newdistance!=-1)
+                                    cleaningroom->matrixspace[i][j].setdistance(newdistance+1);
                                 distancesetup=0;
                             }
                         }        
@@ -211,9 +212,6 @@ void setcelldistance(floor *cleaningroom, int cleaningcellnum, int initial_row, 
                     break;
                 }
             }
-        
-            
-
     
 }
 int main(){
@@ -273,15 +271,18 @@ int main(){
     }
     cout << situation << endl;*/
     setcelldistance(cleaningroom,cleaningcellnum,initial_row,initial_col);
-    for(int i=0;i<m+2;i++){
-        for(int j=0;j<n+2;j++){
-            cout << cleaningroom->matrixspace[i][j].getobstacle() << " ";
+    for(int i=1;i<m+1;i++){
+        for(int j=1;j<n+1;j++){
+            if(i==initial_row && j==initial_col)
+                cout << "R ";
+            else
+                cout << cleaningroom->matrixspace[i][j].getobstacle() << " ";
         }
         cout << endl;
     }
     cout << endl;
-    for(int i=0;i<m+2;i++){
-        for(int j=0;j<n+2;j++){
+    for(int i=1;i<m+1;i++){
+        for(int j=1;j<n+1;j++){
             if(cleaningroom->matrixspace[i][j].getdistance()!=-1)
                 cout << " " << cleaningroom->matrixspace[i][j].getdistance() << " ";
             else
