@@ -95,6 +95,60 @@ class pathqueue{
             pathelementnum++;
         }
         void pop(){
+            path *tmp=first;
+            if(first==last){
+                first=NULL;
+                last=NULL;
+                delete tmp;
+                pathelementnum=0;
+            }
+            else{
+                /*path *current=first;
+                while(current->getnext()!=last){
+                    current=current->getnext();
+                }
+                current->setnext(NULL);
+                last=current;
+                delete tmp;
+                pathelementnum--;*/
+                first=first->getnext();
+                delete tmp;
+                pathelementnum--;
+            }
+        }
+        path *front(){
+            return this->first;
+        }
+        bool Isempty(){
+            return this->first==NULL;
+        }
+        int getelementnum(){
+            return this->pathelementnum;
+        }
+        void setelementnum(int num){
+            this->pathelementnum=num;
+        }
+};
+class pathstack{
+    private:
+        int pathelementnum;
+        path *first;
+        path *last;
+    public:
+        pathstack():pathelementnum(0),first(NULL),last(NULL){}
+        void push(int row, int col){
+            path *newpath=new path(row,col);
+            if(first==NULL){
+                first=newpath;
+                last=newpath;
+            }
+            else{
+                last->setnext(newpath);
+                last=newpath;    
+            }
+            pathelementnum++;
+        }
+        void pop(){
             path *tmp=last;
             if(first==last){
                 first=NULL;
@@ -113,7 +167,12 @@ class pathqueue{
                 pathelementnum--;
             }
         }
-
+        path *top(){
+            return this->last;
+        }
+        bool Isempty(){
+            return this->first==NULL;
+        }
 };
 int spacemindistance(floor *cleaningroom, int row, int col){
     /*
@@ -285,6 +344,7 @@ void setcelldistance(floor *cleaningroom, int initial_row, int initial_col){
 void clearfloor(floor *cleaningroom, int initial_row, int initial_col, int cleaningcellnum, int battery){
     ofstream file2;
     pathqueue cleaningpath;
+    cleaningpath.push(initial_row-1,initial_col-1);
     int power=battery;
     int tmp_row,tmp_col;
     int current_row=initial_row;
@@ -294,8 +354,8 @@ void clearfloor(floor *cleaningroom, int initial_row, int initial_col, int clean
     int dis1,dis2,dis3,dis4;
     bool stuck;
     bool finish=0;
-    while(finish){
-        if(power>current_distance/2+1){
+    while(!finish){
+        if(power>current_distance+1){
             tmp_distance=-1;
             stuck=1;
             /*int dis1=cleaningroom->matrixspace[current_row][current_col-1].getdistance();
@@ -410,113 +470,115 @@ void clearfloor(floor *cleaningroom, int initial_row, int initial_col, int clean
                     }
                 }
             }
-            else{
-                bool find=0;
-                //向左檢查
-                if(!cleaningroom->matrixspace[current_row][current_col-1].getobstacle()){
-                    if(cleaningroom->matrixspace[current_row][current_col-1].getdistance()<current_distance){
-                        if(!cleaningroom->matrixspace[current_row][current_col-1].getvisited()){
-                            tmp_row=current_row;
-                            tmp_col=current_col-1;
-                            tmp_distance=cleaningroom->matrixspace[current_row][current_col-1].getdistance();
-                            find=1;
-                        }
+        }
+        else{
+            bool find=0;
+            //向左檢查
+            if(!cleaningroom->matrixspace[current_row][current_col-1].getobstacle()){
+                if(cleaningroom->matrixspace[current_row][current_col-1].getdistance()<current_distance){
+                    if(!cleaningroom->matrixspace[current_row][current_col-1].getvisited()){
+                        tmp_row=current_row;
+                        tmp_col=current_col-1;
+                        tmp_distance=cleaningroom->matrixspace[current_row][current_col-1].getdistance();
+                        find=1;
                     }
                 }
-                //向上檢查
-                if(!find){
-                    if(!cleaningroom->matrixspace[current_row-1][current_col].getobstacle()){
-                        if(cleaningroom->matrixspace[current_row-1][current_col].getdistance()<current_distance){
-                            if(!cleaningroom->matrixspace[current_row-1][current_col].getvisited()){
-                                tmp_row=current_row-1;
-                                tmp_col=current_col;
-                                tmp_distance=cleaningroom->matrixspace[current_row-1][current_col].getdistance();
-                                find=1;
-                            }
-                        }
-                    }
-                }
-                //向右檢查
-                if(!find){
-                    if(!cleaningroom->matrixspace[current_row][current_col+1].getobstacle()){
-                        if(cleaningroom->matrixspace[current_row][current_col+1].getdistance()<current_distance){
-                            if(!cleaningroom->matrixspace[current_row][current_col+1].getvisited()){
-                                tmp_row=current_row;
-                                tmp_col=current_col+1;
-                                tmp_distance=cleaningroom->matrixspace[current_row][current_col+1].getdistance();
-                                find=1;
-                            }
-                        }
-                    }
-                }
-                //向下檢查
-                if(!find){
-                    if(!cleaningroom->matrixspace[current_row+1][current_col].getobstacle()){
-                        if(cleaningroom->matrixspace[current_row+1][current_col].getdistance()<current_distance){
-                            if(!cleaningroom->matrixspace[current_row+1][current_col].getvisited()){
-                                tmp_row=current_row+1;
-                                tmp_col=current_col;
-                                tmp_distance=cleaningroom->matrixspace[current_row+1][current_col].getdistance();
-                                find=1;
-                            }
-                        }
-                    }
-                }
-                //還是沒找到
-                //向左檢查
-                if(!find){
-                    if(!cleaningroom->matrixspace[current_row][current_col-1].getobstacle()){
-                        if(cleaningroom->matrixspace[current_row][current_col-1].getdistance()<current_distance){
-                            tmp_row=current_row;
-                            tmp_col=current_col-1;
-                            tmp_distance=cleaningroom->matrixspace[current_row][current_col-1].getdistance();
-                            find=1;
-                            stuck=1;
-                        }
-                    }
-                }
-                //向上檢查
-                if(!find){
-                    if(!cleaningroom->matrixspace[current_row-1][current_col].getobstacle()){
-                        if(cleaningroom->matrixspace[current_row-1][current_col].getdistance()<current_distance){
+            }
+            //向上檢查
+            if(!find){
+                if(!cleaningroom->matrixspace[current_row-1][current_col].getobstacle()){
+                    if(cleaningroom->matrixspace[current_row-1][current_col].getdistance()<current_distance){
+                        if(!cleaningroom->matrixspace[current_row-1][current_col].getvisited()){
                             tmp_row=current_row-1;
                             tmp_col=current_col;
                             tmp_distance=cleaningroom->matrixspace[current_row-1][current_col].getdistance();
                             find=1;
-                            stuck=1;
-                        }
-                    }
-                }
-                //向右檢查
-                if(!find){
-                    if(!cleaningroom->matrixspace[current_row][current_col+1].getobstacle()){
-                        if(cleaningroom->matrixspace[current_row][current_col+1].getdistance()<current_distance){
-                            tmp_row=current_row;
-                            tmp_col=current_col+1;
-                            tmp_distance=cleaningroom->matrixspace[current_row][current_col+1].getdistance();
-                            find=1;
-                            stuck=1;
-                        }
-                    }
-                }
-                //向下檢查
-                if(!find){
-                    if(!cleaningroom->matrixspace[current_row+1][current_col].getobstacle()){
-                        if(cleaningroom->matrixspace[current_row+1][current_col].getdistance()<current_distance){
-                            tmp_row=current_row+1;
-                            tmp_col=current_col;
-                            tmp_distance=cleaningroom->matrixspace[current_row+1][current_col].getdistance();
-                            find=1;
-                            stuck=1;
                         }
                     }
                 }
             }
+            //向右檢查
+            if(!find){
+                if(!cleaningroom->matrixspace[current_row][current_col+1].getobstacle()){
+                    if(cleaningroom->matrixspace[current_row][current_col+1].getdistance()<current_distance){
+                        if(!cleaningroom->matrixspace[current_row][current_col+1].getvisited()){
+                            tmp_row=current_row;
+                            tmp_col=current_col+1;
+                            tmp_distance=cleaningroom->matrixspace[current_row][current_col+1].getdistance();
+                            find=1;
+                        }
+                    }
+                }
+            }
+            //向下檢查
+            if(!find){
+                if(!cleaningroom->matrixspace[current_row+1][current_col].getobstacle()){
+                    if(cleaningroom->matrixspace[current_row+1][current_col].getdistance()<current_distance){
+                        if(!cleaningroom->matrixspace[current_row+1][current_col].getvisited()){
+                            tmp_row=current_row+1;
+                            tmp_col=current_col;
+                            tmp_distance=cleaningroom->matrixspace[current_row+1][current_col].getdistance();
+                            find=1;
+                        }
+                    }
+                }
+            }
+            //還是沒找到
+            //向左檢查
+            if(!find){
+                if(!cleaningroom->matrixspace[current_row][current_col-1].getobstacle()){
+                    if(cleaningroom->matrixspace[current_row][current_col-1].getdistance()<current_distance){
+                        tmp_row=current_row;
+                        tmp_col=current_col-1;
+                        tmp_distance=cleaningroom->matrixspace[current_row][current_col-1].getdistance();
+                        find=1;
+                        stuck=1;
+                    }
+                }
+            }
+            //向上檢查
+            if(!find){
+                if(!cleaningroom->matrixspace[current_row-1][current_col].getobstacle()){
+                    if(cleaningroom->matrixspace[current_row-1][current_col].getdistance()<current_distance){
+                        tmp_row=current_row-1;
+                        tmp_col=current_col;
+                        tmp_distance=cleaningroom->matrixspace[current_row-1][current_col].getdistance();
+                        find=1;
+                        stuck=1;
+                    }
+                }
+            }
+            //向右檢查
+            if(!find){
+                if(!cleaningroom->matrixspace[current_row][current_col+1].getobstacle()){
+                    if(cleaningroom->matrixspace[current_row][current_col+1].getdistance()<current_distance){
+                        tmp_row=current_row;
+                        tmp_col=current_col+1;
+                        tmp_distance=cleaningroom->matrixspace[current_row][current_col+1].getdistance();
+                        find=1;
+                        stuck=1;
+                    }
+                }
+            }
+            //向下檢查
+            if(!find){
+                if(!cleaningroom->matrixspace[current_row+1][current_col].getobstacle()){
+                    if(cleaningroom->matrixspace[current_row+1][current_col].getdistance()<current_distance){
+                        tmp_row=current_row+1;
+                        tmp_col=current_col;
+                        tmp_distance=cleaningroom->matrixspace[current_row+1][current_col].getdistance();
+                        find=1;
+                        stuck=1;
+                    }
+                }
+            }
         }
+        
         current_row=tmp_row;
         current_col=tmp_col;
         current_distance=tmp_distance;
-        cleaningpath.push(tmp_row,tmp_col);
+        cleaningpath.push(current_row-1,current_col-1);
+        cleaningpath.setelementnum(cleaningpath.getelementnum()+1);
         power--;
         if(!stuck)
             cleaningcellnum--;
@@ -529,10 +591,147 @@ void clearfloor(floor *cleaningroom, int initial_row, int initial_col, int clean
             finish=leftvisited&upvisited&rightvisited&downvisited;
         }
     }
+    //最後檢查
+    while(cleaningcellnum>0){
+        bool find=0;
+        for(int i=1;i<cleaningroom->getrow()+1;i++){
+            for(int j=1;j<cleaningroom->getcol()+1;j++){
+                if(!cleaningroom->matrixspace[i][j].getobstacle()){
+                    if(!cleaningroom->matrixspace[i][j].getvisited()){
+                        current_row=i;
+                        current_col=j;
+                        current_distance=cleaningroom->matrixspace[i][j].getdistance();
+                        find=1;
+                        break;
+                    }
+                }
+            }
+            if(find)
+                break;
+        }
+        //倒回來走
+        pathstack A;
+        pathqueue B;
+        A.push(current_row-1,current_col-1);
+        while(current_distance!=0){
+            int dis1=cleaningroom->matrixspace[current_row][current_col-1].getdistance();
+            int dis2=cleaningroom->matrixspace[current_row-1][current_col].getdistance();
+            int dis3=cleaningroom->matrixspace[current_row][current_col+1].getdistance();
+            int dis4=cleaningroom->matrixspace[current_row+1][current_col].getdistance();
+            //向左
+            if(!cleaningroom->matrixspace[current_row][current_col-1].getobstacle()){
+                if(!cleaningroom->matrixspace[current_row][current_col-1].getvisited()){
+                    if(dis1<current_distance){
+                        current_distance=cleaningroom->matrixspace[current_row][current_col-1].getdistance();
+                        current_col=current_col-1;
+                        A.push(current_row-1,current_col-1);
+                        B.push(current_row-1,current_col-1);
+                        continue;
+                    }
+                    /*else if(power>dis1){
+                        current_col=current_col-1;
+                        current_distance=cleaningroom->matrixspace[current_row][current_col-1].getdistance();   
+                    }*/
+                }
+            }
+            //向上
+            if(!cleaningroom->matrixspace[current_row-1][current_col].getobstacle()){
+                if(!cleaningroom->matrixspace[current_row-1][current_col].getvisited()){
+                    if(dis2<current_distance){
+                        current_distance=cleaningroom->matrixspace[current_row-1][current_col].getdistance();
+                        current_row=current_row-1;
+                        A.push(current_row-1,current_col-1);
+                        B.push(current_row-1,current_col-1);
+                        continue;
+                    }
+                }
+            }
+            //向右
+            if(!cleaningroom->matrixspace[current_row][current_col+1].getobstacle()){
+                if(!cleaningroom->matrixspace[current_row][current_col+1].getvisited()){
+                    if(dis3<current_distance){
+                        current_distance=cleaningroom->matrixspace[current_row][current_col+1].getdistance();
+                        current_col=current_col+1;
+                        A.push(current_row-1,current_col-1);
+                        B.push(current_row-1,current_col-1);
+                        continue;
+                    }
+                }
+            }
+            //向下
+            if(!cleaningroom->matrixspace[current_row+1][current_col].getobstacle()){
+                if(!cleaningroom->matrixspace[current_row+1][current_col].getvisited()){
+                    if(dis4<current_distance){
+                        current_distance=cleaningroom->matrixspace[current_row+1][current_col].getdistance();
+                        current_row=current_row+1;
+                        A.push(current_row-1,current_col-1);
+                        B.push(current_row-1,current_col-1);
+                        continue;
+                    }
+                }
+            }
+            //向左
+            if(!cleaningroom->matrixspace[current_row][current_col-1].getobstacle()){
+                if(dis1<current_distance){
+                    current_distance=cleaningroom->matrixspace[current_row][current_col-1].getdistance();
+                    current_col=current_col-1;
+                    A.push(current_row-1,current_col-1);
+                    B.push(current_row-1,current_col-1);
+                    continue;
+                }
+            }
+            //向上
+            if(!cleaningroom->matrixspace[current_row-1][current_col].getobstacle()){
+                if(dis2<current_distance){
+                    current_distance=cleaningroom->matrixspace[current_row-1][current_col].getdistance();
+                    current_row=current_row-1;
+                    A.push(current_row-1,current_col-1);
+                    B.push(current_row-1,current_col-1);
+                    continue;
+                }
+            }
+            //向右
+            if(!cleaningroom->matrixspace[current_row][current_col+1].getobstacle()){
+                if(dis3<current_distance){
+                    current_distance=cleaningroom->matrixspace[current_row][current_col+1].getdistance();
+                    current_col=current_col+1;
+                    A.push(current_row-1,current_col-1);
+                    B.push(current_row-1,current_col-1);
+                    continue;
+                }
+            }
+            //向下
+            if(!cleaningroom->matrixspace[current_row+1][current_col].getobstacle()){
+                if(dis4<current_distance){
+                    current_distance=cleaningroom->matrixspace[current_row+1][current_col].getdistance();
+                    current_row=current_row+1;
+                    A.push(current_row-1,current_col-1);
+                    B.push(current_row-1,current_col-1);
+                    continue;
+                }
+            }
+        }
+        //push 進cleaningpath isempty
+        while(!A.Isempty()){
+            cleaningpath.push(A.top()->getrow()-1,A.top()->getcol()-1);
+            A.pop();
+            cleaningpath.setelementnum(cleaningpath.getelementnum()+1);
+        }
+        while(!B.Isempty()){
+            cleaningpath.push(B.front()->getrow()-1,B.front()->getcol()-1);
+            B.pop();
+            cleaningpath.setelementnum(cleaningpath.getelementnum()+1);
+        }
+        cleaningcellnum--;
+    }
 
     //if(tmp_distance==-1)
     file2.open("final.path");
-
+    file2 << cleaningpath.getelementnum() << endl;
+    while(!cleaningpath.Isempty()){
+        file2 << cleaningpath.front()->getrow() << " " << cleaningpath.front()->getcol() << endl;
+        cleaningpath.pop();
+    }
 }
 int main(){
     int m,n,battery;
@@ -557,6 +756,7 @@ int main(){
                 cleaningcellnum++;
             }
             else if(cell=='R'){
+                cleaningroom->matrixspace[i][j].setvisited(1);
                 cleaningroom->matrixspace[i][j].setobstacle(0);
                 cleaningroom->matrixspace[i][j].setdistance(0);
                 initial_row=i;
@@ -591,6 +791,7 @@ int main(){
     }
     cout << situation << endl;*/
     setcelldistance(cleaningroom,initial_row,initial_col);
+    //cout << initial_row << initial_col << endl;
     clearfloor(cleaningroom,initial_row,initial_col,cleaningcellnum,battery);
     for(int i=1;i<m+1;i++){
         for(int j=1;j<n+1;j++){
