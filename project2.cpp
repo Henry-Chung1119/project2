@@ -237,12 +237,14 @@ void setcelldistance(floor *cleaningroom, int initial_row, int initial_col){
         bool distancesetup=1;
         for(int i=1;i<cleaningroom->getrow()-1;i++){
             for(int j=1;j<cleaningroom->getcol()-1;j++){
+                //spacemindistance回傳附近空間的最小distance
                 int newdistance=spacemindistance(cleaningroom,i,j);
                 if(!cleaningroom->matrixspace[i][j].getobstacle()){
                     if(cleaningroom->matrixspace[i][j].getdistance()==-1 || cleaningroom->matrixspace[i][j].getdistance()>newdistance+1)
                     {
                         if(newdistance!=-1)
                             cleaningroom->matrixspace[i][j].setdistance(newdistance+1);
+                        //假如有distance更新，distancesetup就設為0，重新檢查一次
                         distancesetup=0;
                     }
                 }        
@@ -277,7 +279,7 @@ void clearfloor(floor *cleaningroom, int initial_row, int initial_col, int clean
         int dis4=cleaningroom->matrixspace[current_row+1][current_col].getdistance();
         if(power>current_distance+1){
             bool find=0;
-            //找距離最大且還未被拜訪過
+            //找周遭距離大於當前距離且還未被拜訪過
             //向左檢查
             if(!cleaningroom->matrixspace[current_row][current_col-1].getobstacle()){
                 if(!cleaningroom->matrixspace[current_row][current_col-1].getvisited()){
@@ -935,6 +937,7 @@ void clearfloor(floor *cleaningroom, int initial_row, int initial_col, int clean
         file2 << cleaningpath.front()->getrow() << " " << cleaningpath.front()->getcol() << endl;
         cleaningpath.pop();
     }
+    file2.close();
 }
 int main(){
     int m,n,battery;
