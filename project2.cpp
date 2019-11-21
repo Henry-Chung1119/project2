@@ -277,8 +277,9 @@ void clearfloor(floor *cleaningroom, int initial_row, int initial_col, int clean
         int dis2=cleaningroom->matrixspace[current_row-1][current_col].getdistance();
         int dis3=cleaningroom->matrixspace[current_row][current_col+1].getdistance();
         int dis4=cleaningroom->matrixspace[current_row+1][current_col].getdistance();
+        bool find=0;
         if(power>current_distance+1){
-            bool find=0;
+            //bool find=0;
             //找周遭距離大於當前距離且還未被拜訪過
             //向左檢查
             if(!cleaningroom->matrixspace[current_row][current_col-1].getobstacle()){
@@ -430,7 +431,7 @@ void clearfloor(floor *cleaningroom, int initial_row, int initial_col, int clean
             }
         }
         else{
-            bool find=0;
+            //bool find=0;
             //找距離較短且尚未被拜訪過
             //向左檢查
             if(!cleaningroom->matrixspace[current_row][current_col-1].getobstacle()){
@@ -525,7 +526,8 @@ void clearfloor(floor *cleaningroom, int initial_row, int initial_col, int clean
             }
         }
         cleaningroom->matrixspace[current_row][current_col].setvisited(1);
-        cleaningpath.push(current_row-1,current_col-1);
+        if(find)
+            cleaningpath.push(current_row-1,current_col-1);
         power--;
         if(current_row==initial_row && current_col==initial_col){
             power=battery;
@@ -972,7 +974,7 @@ int main(){
     }
     setcelldistance(cleaningroom,initial_row,initial_col);
     clearfloor(cleaningroom,initial_row,initial_col,cleaningcellnum,battery);
-    for(int i=1;i<m+1;i++){
+    /*for(int i=1;i<m+1;i++){
         for(int j=1;j<n+1;j++){
             if(i==initial_row && j==initial_col)
                 cout << "R ";
@@ -990,6 +992,6 @@ int main(){
                 cout << " " << cleaningroom->matrixspace[i][j].getdistance() << " ";
         }
         cout << endl;
-    }
+    }*/
     file1.close();
 }
